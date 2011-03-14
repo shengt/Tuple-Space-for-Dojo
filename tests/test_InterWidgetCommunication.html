@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+		"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>Tuple Space Test: Test inter-widget communication</title>
+		<style type="text/css">
+			@import "../build/dojo-release-1.5.0-src/dojo/resources/dojo.css";
+			@import "../build/dojo-release-1.5.0-src/dijit/tests/css/dijitTests.css";
+			@import "../build/dojo-release-1.5.0-src/dijit/themes/tundra/tundra.css";
+			@import "../build/dojo-release-1.5.0-src/dojox/layout/resources/GridContainer.css";
+			@import "../build/dojo-release-1.5.0-src/dojox/layout/resources/DndGridContainer.css";
+		</style>
+		
+		<style type="text/css">
+			.tupleSpaceMonitor {
+				width: 100%;
+			}
+			.tupleSpaceMonitor table {
+				 border-width:1px;
+				 border-spacing: 2px;
+				 border-color:gray;
+				 border-style:solid;
+				 border-collapse:collapse;
+				 width: 100%;
+			}
+			.tupleSpaceMonitor thead {
+				background-color: #EEE;
+			}
+			.tupleSpaceMonitor tbody tr:hover {
+				background-color: #FFFFCC;
+			}
+			.tupleSpaceMonitor td, .tupleSpaceMonitor th {
+				border-width: 1px;
+				padding: 1px;
+				border-style: inset;
+				border-color: gray;
+			}
+			.tupleSpaceMonitor tr th {
+				font-weight: bolder;
+			}
+		</style>
+
+		<script type="text/javascript" src="../build/dojo-release-1.5.0-src/dojo/dojo.js" djConfig="parseOnLoad: true, isDebug: true"></script>
+		<script type="text/javascript" src="../build/dojo-release-1.5.0-src/util/doh/runner.js"></script>
+		<script type="text/javascript">
+			
+			dojo.require("dijit.dijit");
+			dojo.require("dojox.layout.GridContainer");
+			dojo.require("dijit.TitlePane");
+			dojo.require("dojo.parser");
+			
+			dojo.registerModulePath("nz.ac.auckland", "../../../");
+			dojo.require("nz.ac.auckland.tupleSpace.manager");
+			dojo.require("nz.ac.auckland.tupleSpace.widgets.TupleSpaceWidget");
+			dojo.require("nz.ac.auckland.tests.widgets.TestWidget");
+		</script>
+		<script type="text/javascript">
+			dojo.addOnLoad(function(){
+				var ts = nz.ac.auckland.tupleSpace, 
+					tsm = nz.ac.auckland.tupleSpace.manager;
+				
+				var dijit1 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_1"}, dojo.byId("widget1"));
+				var dijit2 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_2"}, dojo.byId("widget2"));
+				var dijit3 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_3"}, dojo.byId("widget3"));
+				doh.register("TupleSpace: Inter-widget Communication", []);
+				doh.run();
+			});
+			</script>
+	</head>
+	<body class="tundra">
+		<h1>Test of Inter Widget Communication</h1>
+		This page is intended for testing of the functions of inter-widget communication.
+		
+		<div>
+			<div id="tupleSpace" style="height:100px;overflow-y:auto;padding:10px;">
+				<div dojoType="nz.ac.auckland.tupleSpace.widgets.TupleSpaceWidget"></div>
+			</div>
+			<div dojoType="dojox.layout.GridContainer" nbZones="2" opacity="0.7"
+				allowAutoScroll="true" hasResizableColumns="false" withHandles="true" acceptTypes="TitlePane" dragRestriction="true">
+				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Widget 1">
+					<div class="widget" id="widget1">
+					</div>
+				</div>
+				
+				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Widget 2">
+					<div class="widget" id="widget2">
+					</div>
+				</div>
+				
+				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Widget 3">
+					<div class="widget" id="widget3">
+					</div>
+				</div>
+	
+			</div>
+		</div>
+	</body>
+</html>

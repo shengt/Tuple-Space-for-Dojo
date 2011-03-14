@@ -1,0 +1,34 @@
+<div class="${baseClass}">
+	<div>
+		<form onsubmit="return false;">
+			<div>
+				<label>Source Id: </label>
+				<input class="ts_inputBox" style="color:gray" type="text" readonly value="${sourceId}">
+			</div><br>
+			<div>
+				<label>Target Id: </label>
+				<input dojoAttachPoint="targetIdInput" class="ts_inputBox" type="text" value="">
+			</div><br>
+			<div>
+				<label>Topic: </label>
+				<input dojoAttachPoint="topicInput" class="ts_inputBox" type="text" value='topic1'>
+			</div><br>
+			<div>
+				<label>Payload: </label>
+				<input dojoAttachPoint="payloadInput" class="ts_inputBox" type="text" value='{"message":"Hello World!"}'>
+			</div>
+		</form>
+	</div>
+	<hr>
+	<div>
+		<button dojoAttachEvent="onclick:testWrite">Write</button>
+		<button dojoAttachEvent="onclick:testRead">Read</button>
+		<button dojoAttachEvent="onclick:testTake">Take</button><br>
+		<button dojoAttachEvent="onclick:testReadp">Non-blocking Read</button>
+		<button dojoAttachEvent="onclick:testTakep">Non-blocking Take</button>
+	</div>
+	<hr>
+	<div>
+		<div dojoAttachPoint="messagePane" style="color: red;"></div>
+	</div>
+</div>
