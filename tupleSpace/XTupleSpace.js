@@ -1,8 +1,26 @@
 dojo.provide("nz.ac.auckland.tupleSpace.XTupleSpace");
+dojo.provide("nz.ac.auckland.tupleSpace.XTuple");
+dojo.provide("nz.ac.auckland.tupleSpace.XTupleTemplate");
 
 dojo.require("nz.ac.auckland.tupleSpace.TupleSpace");
+dojo.require("nz.ac.auckland.tupleSpace.Tuple");
 
 dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace.TupleSpace], {
+	
+	_timeStampPool: {},
+	
+	write: function(tuple, callback) {
+		if (tuple instanceof nz.ac.auckland.tupleSpace.Tuple) {
+			tuple.timeStamp = nz.ac.auckland.tupleSpace.utils.getTimeStamp();
+			while (this._timeStampPool[tuple.timeStamp]) {
+				// ensure timeStamp won't get conflicted.
+				tuple.timeStamp++;
+			}
+			this._timeStampPool[tuple.timeStamp] = tuple;
+		}
+		this.inherited(arguments);
+		
+	},
 	
 	/************************************
 	 * Read unmaked tuple, and loop
@@ -100,6 +118,72 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace
 	
 	takeLatestp: function(tupleTemplate, callback) {
 		this.takeLatest(tupleTemplate, callback, true);
+	},
+	
+	/**
+	 * Clean all tuples and callbacks in tuplespace.
+	 * Caution: this function will remove all data and reset the tuple space.
+	 */
+	reset: function() {
+		this.inherited(arguments);
+		this._timeStampPool = {};
 	}
 	
+});
+
+
+/**
+ * Tuple class
+ */
+dojo.declare("nz.ac.auckland.tupleSpace.XTuple", [nz.ac.auckland.tupleSpace.Tuple], {
+	uuid: "",
+	payload: null,
+	timeStamp: 0,
+	topic: "",
+	sourceId: null,
+	targetId: null,
+	
+	constructor: function(sourceId, targetId, payload, topic) {
+		this.payload = payload;
+		this.sourceId = sourceId;
+		this.targetId = targetId;
+		this.topic = topic;
+		this.timeStamp = nz.ac.auckland.tupleSpace.utils.getTimeStamp();
+		this.uuid = nz.ac.auckland.tupleSpace.utils.getUuid();
+	}
+});
+
+/**
+ * Tuple template is the same as Tuple
+ */
+dojo.declare("nz.ac.auckland.tupleSpace.XTupleTemplate", [nz.ac.auckland.tupleSpace.TupleTemplate], {
+	payload: null,
+	timeStamp: 0,
+	topic: "",
+	sourceId: null,
+	targetId: null,
+	
+	constructor: function(sourceId, targetId, payload, topic, timeStamp) {
+		this.sourceId = sourceId;
+		this.targetId = targetId;
+		this.payload = payload;
+		this.topic = topic;
+		this.timeStamp = timeStamp;
+	},
+	
+	/** 
+	 * Match the tuple with tuple template.
+	 * @param tupleTemplate
+	 */
+	match: function(tuple) {
+		return this.inherited(arguments);
+	},
+	
+	laterThan: function(tuple) {
+		return this.timeStamp >= tuple.timeStamp;
+	},
+	
+	earlierThan: function(tuple) {
+		return this.timeStamp < tuple.timeStamp;
+	}
 });

@@ -29,12 +29,11 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		
 		testWrite: function() {
 			this.messagePane.innerHTML = "";
-			var tuple = dojo.mixin(new ts.Tuple(), this._getObjectFromParam());
+			var obj = this._getObjectFromParam();
+			var tuple = new ts.XTuple(obj.sourceId, obj.targetId, obj.payload, obj.topic);
 			tupleSpace.write(tuple, dojo.hitch(this, function(t, err) {
 				if (!err) {
-					if (t.length > 0) {
-						this._showMessage("Write: " + t[0].uuid);
-					}
+					this._showMessage("Write: " + t.uuid);
 				}
 			}));
 		},
@@ -42,8 +41,13 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		testRead: function() {
 			this.messagePane.innerHTML = "";
 			var obj = this._getObjectFromParam();
-			obj.sourceId = null;
-			var tupleTemplate = dojo.mixin(new ts.TupleTemplate(), obj);
+			dojo.mixin(obj, {
+				sourceId: "%%",
+				targetId: obj.targetId || "%%",
+				payload: obj.palyload || "%%",
+				topic: obj.topic || "%%"
+			})
+			var tupleTemplate = new ts.XTupleTemplate(obj.sourceId, obj.targetId, obj.payload, obj.topic);
 			tupleSpace.read(tupleTemplate, dojo.hitch(this, function(t, err) {
 				if (!err) {
 					if (t.length > 0) {
@@ -56,8 +60,13 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		testTake: function() {
 			this.messagePane.innerHTML = "";
 			var obj = this._getObjectFromParam();
-			obj.sourceId = null;
-			var tupleTemplate = dojo.mixin(new ts.TupleTemplate(), obj);
+			dojo.mixin(obj, {
+				sourceId: "%%",
+				targetId: obj.targetId || "%%",
+				payload: obj.palyload || "%%",
+				topic: obj.topic || "%%"
+			})
+			var tupleTemplate = new ts.XTupleTemplate(obj.sourceId, obj.targetId, obj.payload, obj.topic);
 			tupleSpace.take(tupleTemplate, dojo.hitch(this, function(t, err) {
 				if (!err) {
 					if (t.length > 0) {
@@ -70,8 +79,13 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		testReadp: function() {
 			this.messagePane.innerHTML = "";
 			var obj = this._getObjectFromParam();
-			obj.sourceId = null;
-			var tupleTemplate = dojo.mixin(new ts.TupleTemplate(), obj);
+			dojo.mixin(obj, {
+				sourceId: "%%",
+				targetId: obj.targetId || "%%",
+				payload: obj.palyload || "%%",
+				topic: obj.topic || "%%"
+			})
+			var tupleTemplate = new ts.XTupleTemplate(obj.sourceId, obj.targetId, obj.payload, obj.topic);
 			tupleSpace.readp(tupleTemplate, dojo.hitch(this, function(t, err) {
 				if (!err) {
 					if (t.length > 0) {
@@ -84,8 +98,13 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		testTakep: function() {
 			this.messagePane.innerHTML = "";
 			var obj = this._getObjectFromParam();
-			obj.sourceId = null;
-			var tupleTemplate = dojo.mixin(new ts.TupleTemplate(), obj);
+			dojo.mixin(obj, {
+				sourceId: "%%",
+				targetId: obj.targetId || "%%",
+				payload: obj.palyload || "%%",
+				topic: obj.topic || "%%"
+			})
+			var tupleTemplate = new ts.XTupleTemplate(obj.sourceId, obj.targetId, obj.payload, obj.topic);
 			tupleSpace.takep(tupleTemplate, dojo.hitch(this, function(t, err) {
 				if (!err) {
 					if (t.length > 0) {

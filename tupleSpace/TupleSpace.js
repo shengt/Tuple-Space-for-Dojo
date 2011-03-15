@@ -11,7 +11,6 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 	// Page wide tuple space
 	_tupleSpace: {},
 	_blockingList: {},
-	_timeStampPool: {},
 	
 	/**
 	 * Write a tuple into tuple space
@@ -21,13 +20,7 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 	write: function(tuple, callback) {
 		var done = false;
 		if (tuple instanceof nz.ac.auckland.tupleSpace.Tuple) {
-			tuple.timeStamp = nz.ac.auckland.tupleSpace.utils.getTimeStamp();
 			this._tupleSpace[tuple.uuid] = tuple;
-			while (this._timeStampPool[tuple.timeStamp]) {
-				// ensure timeStamp won't get conflicted.
-				tuple.timeStamp++;
-			}
-			this._timeStampPool[tuple.timeStamp] = tuple;
 			done = true;
 		} else {
 			done = false;
@@ -45,7 +38,7 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 			var tupleTemplate = new nz.ac.auckland.tupleSpace.TupleTemplate();
 			tupleTemplate = dojo.mixin(tupleTemplate, dojo.fromJson(key));
 			
-			if (tuple.match(tupleTemplate)) {
+			if (tupleTemplate.match(tuple)) {
 				while (dojo.isArray(this._blockingList[key]) && this._blockingList[key].length > 0 && this._tupleSpace[tuple.uuid]) {
 					var cb = this._blockingList[key].pop();
 					try {
@@ -87,14 +80,13 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 				dojo.forEach(tuples, function(tuple) {
 					try {
 						delete self._tupleSpace[tuple.uuid];
-						delete self._timeStampPool[tuple.timeStamp];
 					} catch (e) {
 						// Tuple is not there.
 					}
 				}, this);
 				callback(tuples);
 			} else {
-				callback(null, error);
+				callback(tuples, error);
 			}
 		};
 		this.read(tupleTemplate, proxy, predict);
@@ -116,7 +108,7 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 		var results = [];
 		for (id in this._tupleSpace) {
 			if (this._tupleSpace[id] instanceof nz.ac.auckland.tupleSpace.Tuple) {
-				if (this._tupleSpace[id].match(tupleTemplate)) {
+				if (tupleTemplate.match(this._tupleSpace[id])) {
 					results.push(this._tupleSpace[id]);
 				}
 			}
@@ -157,7 +149,6 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 				dojo.forEach(tuples, function(tuple) {
 					try {
 						delete self._tupleSpace[tuple.uuid];
-						delete self._timeStampPool[tuple.timeStamp];
 					} catch (e) {
 						// Tuple is not there.
 					}
@@ -181,7 +172,6 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 	reset: function() {
 		this._tupleSpace = {};
 		this._blockingList = {};
-		this._timeStampPool = {};
 	},
 	
 	size: function() {
@@ -200,68 +190,54 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
  */
 dojo.declare("nz.ac.auckland.tupleSpace.Tuple", null, {
 	uuid: "",
-	payload: null,
-	timeStamp: null,
-	topic: "",
-	sourceId: null,
-	targetId: null,
+	parameters: null,
 	
-	constructor: function(sourceId, targetId, payload, topic, timeStamp) {
-		this.payload = payload;
-		this.sourceId = sourceId;
-		this.targetId = targetId;
-		this.topic = topic;
-		this.timeStamp = timeStamp || nz.ac.auckland.tupleSpace.utils.getTimeStamp();
+	constructor: function() {
 		this.uuid = nz.ac.auckland.tupleSpace.utils.getUuid();
-	},
-	
-	/** 
-	 * Match the tuple with tuple template.
-	 * @param tupleTemplate
-	 */
-	match: function(tupleTemplate) {
-	    // TODO: improve template matching
-		if (tupleTemplate instanceof nz.ac.auckland.tupleSpace.TupleTemplate) {
-			var keywordList = ['uuid', 'sourceId', 'targetId', 'topic', 'timeStamp', 'payload'];
-			var valid = false;
-			for (var i=0; i<keywordList.length; i++) {
-				if (this[keywordList[i]] && tupleTemplate[keywordList[i]]) {
-					var left = this[keywordList[i]], right = tupleTemplate[keywordList[i]];
-					if (keywordList[i] === "payload") {
-						left = dojo.toJson(left);
-						right = dojo.toJson(right);
-					}
-					
-					if (left != right) {
-						return false;
-					} else {
-						if (left) {
-							valid = true;
-						}
-					}
-				}
-			}
-			return valid;
-		} else {
-			return false;
-		}
-	},
-	
-	laterThan: function(timeStamp) {
-		return this.timeStamp >= timeStamp;
-	},
-	
-	earlierThan: function(timeStam) {
-		return this.timeStamp < timeStamp;
+		this.parameters = arguments;
 	}
 });
 
 /**
  * Tuple template is the same as Tuple
  */
-dojo.declare("nz.ac.auckland.tupleSpace.TupleTemplate", [nz.ac.auckland.tupleSpace.Tuple], {
+dojo.declare("nz.ac.auckland.tupleSpace.TupleTemplate", null, {
+	
+	parameters: null,
+	
 	constructor: function() {
-		this.uuid = "";
-		this.timeStamp = "";
+		this.parameters = arguments;
+	},
+	
+	/** 
+	 * Match the tuple with tuple template.
+	 * @param tupleTemplate
+	 */
+	match: function(tuple) {
+		if (tuple) {
+			var max = Math.min(this.parameters.length, tuple.parameters.length);
+			for (var i = 0; i < max; i++) {
+				if (!this.matchField(tuple.parameters[i], this.parameters[i])) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	},
+	
+	matchField: function(value, template) {
+		if (value !== template) {
+			if (nz.ac.auckland.tupleSpace.utils.isRegex(template)) {
+				return template.text(value);
+			} else if (template === "%%") {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 });

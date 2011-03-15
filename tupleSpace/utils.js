@@ -21,6 +21,29 @@ dojo.require("dojox.uuid.generateTimeBasedUuid");
 		 */
 		getUuid: function() {
 			return "_tuple_" + dojox.uuid.generateTimeBasedUuid().replace(/-/g, "");
+		},
+		
+		isRegex: function(regex) {
+			return Object.prototype.toString.call(regex) === "[object RegExp]";
+		},
+		
+		startsWith: function(str, start, ignoreCase) {
+			if(ignoreCase) {
+	            str = str.toLowerCase();
+	            start = start.toLowerCase();
+	        }
+	        return str.indexOf(start) == 0;
+		},
+		
+		endsWith: function(str, end, ignoreCase) {
+			if(ignoreCase) {
+	            str = str.toLowerCase();
+	            end = end.toLowerCase();
+	        }
+	        if((str.length - end.length) < 0){
+	            return false;
+	        }
+	        return str.lastIndexOf(end) == str.length - end.length;
 		}
 	});
 })();

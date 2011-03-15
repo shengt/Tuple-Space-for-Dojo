@@ -53,6 +53,7 @@
 			dojo.require("nz.ac.auckland.tupleSpace.manager");
 			dojo.require("nz.ac.auckland.tupleSpace.widgets.TupleSpaceWidget");
 			dojo.require("nz.ac.auckland.tests.widgets.TestWidget");
+			
 		</script>
 		<script type="text/javascript">
 			dojo.addOnLoad(function(){
@@ -62,6 +63,7 @@
 				var dijit1 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_1"}, dojo.byId("widget1"));
 				var dijit2 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_2"}, dojo.byId("widget2"));
 				var dijit3 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_3"}, dojo.byId("widget3"));
+				
 				doh.register("TupleSpace: Inter-widget Communication", []);
 				doh.run();
 			});
