@@ -1,0 +1,2 @@
+An in-browser tuple space implemented in Dojo. And an extended tuple space which can be used in inter-widget communications.
+Tested on Dojo 1.5.0. It can be run on Dojo 1.3 or later.
