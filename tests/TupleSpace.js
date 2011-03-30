@@ -28,6 +28,7 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 				tupleSpace.reset();
 		    },
 	 		runTest: function(t){
+				var def = new doh.Deferred();
 	 			var tuple = new ts.Tuple("src_1", null, "Hello world!", "topic1");
 		    	tupleSpace.write(tuple, function(tuple1, error) {
 		    		t.assertFalse(error);
@@ -40,7 +41,9 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		    		t.assertFalse(error);
 		    		t.assertEqual(tuple.uuid, tuple2.uuid);
 		    		t.assertEqual(2, tupleSpace.size());
+					def.callback(true);
 		    	});
+				return def;
 			},
 			tearDown: function(){
 				tupleSpace.reset();
@@ -56,6 +59,7 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 				tupleSpace.write(tuple);
 		    },
 	 		runTest: function(t){
+				var def = new doh.Deferred();
 	 			// Read when the tuple exists.
 	 			var tupleTemplate = new ts.TupleTemplate("%%", "%%", "%%", "topic1");
 	 			tupleSpace.read(tupleTemplate, function(tuples, error) {
@@ -69,14 +73,16 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 	 			// Read when the tuple does not exist. It will be blocked util tuple available.
 	 			var tupleTemplate1 = new ts.TupleTemplate("%%", "%%", "%%", "topic9");
 	 			tupleSpace.read(tupleTemplate1, function(tuples, error) {
-	 				t.assertFalse(error);
+					t.assertFalse(error);
 	 				t.assertTrue(dojo.isArray(tuples));
 	 				t.assertTrue(tupleTemplate1.match(tuples[0]));
+					def.callback(true);
 	 			});
 
 	 			var tuple1 = new ts.Tuple("src_2", null, "Hello world!", "topic9");
 	 			tupleSpace.write(tuple1);
 	 			
+				return def;
 			},
 			tearDown: function(){
 				tupleSpace.reset();
@@ -92,6 +98,8 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 				tupleSpace.write(tuple);
 		    },
 	 		runTest: function(t){
+				var def = new doh.Deferred();
+				
 	 			// Read when the tuple exists.
 	 			var tupleTemplate = new ts.TupleTemplate("%%", "%%", "%%", "topic1");
 	 			tupleSpace.take(tupleTemplate, function(tuples, error) {
@@ -109,12 +117,15 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 	 				t.assertEqual(0, tupleSpace.size());	// taken
 	 				t.assertTrue(dojo.isArray(tuples));
 	 				t.assertTrue(tupleTemplate1.match(tuples[0]));
+					def.callback(true);
 	 			});
 
 	 			t.assertEqual(0, tupleSpace.size());
 	 			var tuple1 = new ts.Tuple("src_2", null, "Hello world!", "topic9");
 	 			tupleSpace.write(tuple1);
 	 			//t.assertEqual(1, tupleSpace.size());		// Not taken
+				
+				return def;
 				
 			},
 			tearDown: function(){
@@ -133,6 +144,8 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		    	});
 		    },
 	 		runTest: function(t){
+				var def = new doh.Deferred();
+				
 	 			// Read when the tuple exists.
 	 			var tupleTemplate = new ts.TupleTemplate("%%", "%%", "%%", "topic1");
 	 			tupleSpace.readp(tupleTemplate, function(tuples, error) {
@@ -150,11 +163,14 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 	 				t.assertFalse(error);
 	 				t.assertTrue(dojo.isArray(tuples));
 	 				t.assertEqual(0, tuples.length);
+					def.callback(true);
 	 			});
 	 			/*
 	 			var tuple1 = new ts.Tuple("src_2", null, "Hello world!", "topic9");
 	 			tupleSpace.write(tuple1);
-	 			 */			 			
+	 			 */
+				
+				return def;
 			},
 			tearDown: function(){
 				tupleSpace.reset();
@@ -172,6 +188,7 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 		    	});
 		    },
 	 		runTest: function(t){
+				var def = new doh.Deferred();
 
 	 			// Read when the tuple exists.
 	 			var tupleTemplate = new ts.TupleTemplate("%%", "%%", "%%", "topic1");
@@ -190,11 +207,14 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 	 				t.assertFalse(error);
 	 				t.assertTrue(dojo.isArray(tuples));
 	 				t.assertEqual(0, tuples.length);
+					def.callback(true);
 	 			});
 	 			/*
 	 			var tuple1 = new ts.Tuple("src_2", null, "Hello world!", "topic9");
 	 			tupleSpace.write(tuple1);
-	 			 */			 		
+	 			 */
+				
+				return def;
 			},
 			tearDown: function(){
 				tupleSpace.reset();

@@ -12,8 +12,10 @@ dojo.require("dojox.uuid.generateTimeBasedUuid");
 		/**
 		 * Get current time.
 		 */
-		getTimeStamp: function() {
-			return (new Date()).valueOf();
+		getTimeStamp: function(date) {
+			// To avoid time stamp confliction.
+			date = date || new Date();
+			return date.valueOf() * 1000;
 		},
 		
 		/**
@@ -21,6 +23,16 @@ dojo.require("dojox.uuid.generateTimeBasedUuid");
 		 */
 		getUuid: function() {
 			return "_tuple_" + dojox.uuid.generateTimeBasedUuid().replace(/-/g, "");
+		},
+		
+		serialize: function(tuple) {
+			return dojo.toJson(tuple);
+		},
+		
+		unserialize: function(str) {
+			var obj = dojo.fromJson(str),
+				type = dojo.getObject(obj.declaredClass);
+			return dojo.mixin(new type(), dojo.fromJson(str));
 		},
 		
 		isRegex: function(regex) {

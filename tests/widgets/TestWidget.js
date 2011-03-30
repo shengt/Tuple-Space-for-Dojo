@@ -13,9 +13,12 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 	
 	dojo.declare("nz.ac.auckland.tests.widgets.TestWidget", [dijit._Widget, dijit._Templated], {
 		
-		templatePath: dojo.moduleUrl("nz.ac.auckland.tests", "widgets/templates/TestWidget.html"),
+		templateString: dojo.cache("nz.ac.auckland.tests", "widgets/templates/TestWidget.html"),
 		
-		sourceId: null,
+		baseClass: "testWidget",
+		widgetsInTemplate: true,
+		
+		sourceId: "",
 		
 		// attach points
 		targetIdInput: null,
@@ -109,6 +112,44 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 				if (!err) {
 					if (t.length > 0) {
 						this._showMessage("Takep: " + t[0].uuid);
+					}
+				}
+			}));
+		},
+		
+		testReadLatest: function() {
+			this.messagePane.innerHTML = "";
+			var obj = this._getObjectFromParam();
+			dojo.mixin(obj, {
+				sourceId: "%%",
+				targetId: obj.targetId || "%%",
+				payload: obj.palyload || "%%",
+				topic: obj.topic || "%%"
+			})
+			var tupleTemplate = new ts.XTupleTemplate(obj.sourceId, obj.targetId, obj.payload, obj.topic);
+			tupleSpace.readLatest(tupleTemplate, dojo.hitch(this, function(t, err) {
+				if (!err) {
+					if (t.length > 0) {
+						this._showMessage("Read Latest: " + t[0].uuid);
+					}
+				}
+			}));
+		},
+		
+		testTakeLatest: function() {
+			this.messagePane.innerHTML = "";
+			var obj = this._getObjectFromParam();
+			dojo.mixin(obj, {
+				sourceId: "%%",
+				targetId: obj.targetId || "%%",
+				payload: obj.palyload || "%%",
+				topic: obj.topic || "%%"
+			})
+			var tupleTemplate = new ts.XTupleTemplate(obj.sourceId, obj.targetId, obj.payload, obj.topic);
+			tupleSpace.takeLatest(tupleTemplate, dojo.hitch(this, function(t, err) {
+				if (!err) {
+					if (t.length > 0) {
+						this._showMessage("Take Latest: " + t[0].uuid);
 					}
 				}
 			}));

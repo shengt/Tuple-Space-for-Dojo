@@ -18,40 +18,20 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 	 * @param callback(tuple, error)
 	 */
 	write: function(tuple, callback) {
-		var done = false;
-		if (tuple instanceof nz.ac.auckland.tupleSpace.Tuple) {
+		var error = null;
+		if (tuple) {
 			this._tupleSpace[tuple.uuid] = tuple;
-			done = true;
 		} else {
-			done = false;
+			error = "Tuple is required!"
 		}
+		
 		if (dojo.isFunction(callback)) {
-			if (done) {
-				callback(tuple, null);
-			} else {
-				callback(null, "Adding tuple failed!");
-			}
+			callback(tuple, error);
 		}
 		
 		// call blocking callbacks
-		for (var key in this._blockingList) {
-			var tupleTemplate = new nz.ac.auckland.tupleSpace.TupleTemplate();
-			tupleTemplate = dojo.mixin(tupleTemplate, dojo.fromJson(key));
-			
-			if (tupleTemplate.match(tuple)) {
-				while (dojo.isArray(this._blockingList[key]) && this._blockingList[key].length > 0 && this._tupleSpace[tuple.uuid]) {
-					var cb = this._blockingList[key].pop();
-					try {
-						// synchronized invoke callbacks
-						cb([tuple]);
-					} catch (e) {
-						// do nothing
-					}
-					if (this._blockingList[key].length === 0) {
-						delete this._blockingList[key];
-					}
-				}
-			}
+		if (!error) {
+			this._callBlocked(tuple);
 		}
 	},
 	
@@ -69,6 +49,11 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 		this.readAllMatched(tupleTemplate, proxy, predict);
 	},
 	
+	/**
+	 * @Override
+	 * @param {Object} tupleTemplate
+	 * @param {Object} callback
+	 */
 	readp: function(tupleTemplate, callback) {
 		this.read(tupleTemplate, callback, true);
 	},
@@ -105,25 +90,15 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 	 *    false: blocking operation. The callback function will not be called until the tuple exists.
 	 */
 	readAllMatched: function(tupleTemplate, callback, predict) {
-		var results = [];
-		for (id in this._tupleSpace) {
-			if (this._tupleSpace[id] instanceof nz.ac.auckland.tupleSpace.Tuple) {
-				if (tupleTemplate.match(this._tupleSpace[id])) {
-					results.push(this._tupleSpace[id]);
-				}
-			}
-		}
+		var results = this._getAll(tupleTemplate);
+		
 		if (results.length === 0) {
 			if (predict) {
 				// non-blocking operation
 				callback(results);
 			} else {
 				// blocking operation
-				var key = dojo.toJson(tupleTemplate);
-				if (!this._blockingList[key]) {
-					this._blockingList[key] = [];
-				}
-				this._blockingList[key].push(callback);
+				this._block(tupleTemplate, callback);
 			}
 		} else {
 			callback(results);
@@ -182,6 +157,52 @@ dojo.declare("nz.ac.auckland.tupleSpace.TupleSpace", null, {
 		    }
 		}
 		return element_count;
+	},
+	
+	_block: function(tupleTemplate, callback) {
+		var key = nz.ac.auckland.tupleSpace.utils.serialize(tupleTemplate);
+		if (!this._blockingList[key]) {
+			this._blockingList[key] = [];
+		}
+		this._blockingList[key].push(callback);
+	},
+	
+	_getAll: function(tupleTemplate) {
+		var results = [];
+		for (id in this._tupleSpace) {
+			if (this._tupleSpace.hasOwnProperty(id) && this._tupleSpace[id]) {
+				if (tupleTemplate.match(this._tupleSpace[id])) {
+					results.push(this._tupleSpace[id]);
+				}
+			}
+		}
+		return results;
+	},
+	
+	_callBlocked: function(tuple) {
+		for (var key in this._blockingList) {
+			if (this._blockingList.hasOwnProperty(key)) {
+				var tupleTemplate = nz.ac.auckland.tupleSpace.utils.unserialize(key);
+				
+				if (tupleTemplate.match(tuple)) {
+					while (dojo.isArray(this._blockingList[key]) && this._blockingList[key].length > 0 && this._tupleSpace[tuple.uuid]) {
+						var cb = this._blockingList[key].pop();
+						
+						// Clean blocking list to prevent it becomes too big.
+						if (this._blockingList[key].length === 0) {
+							delete this._blockingList[key];
+						}
+						
+						try {
+							// synchronized invoke callbacks
+							cb([tuple]);
+						} catch (e) {
+							// do nothing
+						}
+					}
+				}
+			}
+		}
 	}
 });
 

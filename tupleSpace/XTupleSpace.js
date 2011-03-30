@@ -10,7 +10,7 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace
 	_timeStampPool: {},
 	
 	write: function(tuple, callback) {
-		if (tuple instanceof nz.ac.auckland.tupleSpace.Tuple) {
+		if (tuple) {
 			tuple.timeStamp = nz.ac.auckland.tupleSpace.utils.getTimeStamp();
 			while (this._timeStampPool[tuple.timeStamp]) {
 				// ensure timeStamp won't get conflicted.
@@ -18,12 +18,13 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace
 			}
 			this._timeStampPool[tuple.timeStamp] = tuple;
 		}
-		this.inherited(arguments);
 		
+		this.inherited(arguments);
 	},
 	
 	/************************************
 	 * Read unmaked tuple, and loop
+	 * @Override
 	 * @param {Object} tupleTemplate
 	 * @param {Object} callback
 	 * @param {Object} predict
@@ -46,7 +47,7 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace
 			        callback([unmarkedTuple]);
 			        unmarkedTuple.read = true;
 			    } else {
-			        self.clearReadMarkers();
+			        self._clearReadMarkers();
 			        callback([tuples[0]], error);
 			        tuples[0].read = true;
 			    }
@@ -57,11 +58,27 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace
 		this.readAllMatched(tupleTemplate, proxy, predict);
 	},
 	
-	readp: function(tupleTemplate, callback) {
-		this.read(tupleTemplate, callback, true);
+	readLater: function(tupleTemplate, callback, predict) {
+		var self = this;
+		var proxy = function(tuples, error){
+			if (!error) {
+				var results = dojo.filter(tuples, function(tuple){
+					return tupleTemplate.earlierThan(tuple);
+				});
+				
+				if (results.length > 0) {
+					callback(results);
+				} else {
+					self._block(tupleTemplate, callback);
+				}
+			} else {
+				callback(null, error);
+			}
+		};
+		this.readAllMatched(tupleTemplate, proxy, predict);
 	},
 	
-	clearReadMarkers: function() {
+	_clearReadMarkers: function() {
 		for(var e in this._tupleSpace) {
 		    if(this._tupleSpace.hasOwnProperty(e)) {
 				this._tupleSpace[e].read = false;
@@ -120,6 +137,18 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleSpace", [nz.ac.auckland.tupleSpace
 		this.takeLatest(tupleTemplate, callback, true);
 	},
 	
+	register: function(tupleTemplate, callback) {
+	    var proxy = function(tuples, error) {
+            callback(tuples);
+            this.register(tupleTemplate, callback);
+	    }
+	    this.takeLatest(tupleTemplate, proxy);
+	},
+	
+	unregister: function() {
+	    
+	},
+	
 	/**
 	 * Clean all tuples and callbacks in tuplespace.
 	 * Caution: this function will remove all data and reset the tuple space.
@@ -176,7 +205,16 @@ dojo.declare("nz.ac.auckland.tupleSpace.XTupleTemplate", [nz.ac.auckland.tupleSp
 	 * @param tupleTemplate
 	 */
 	match: function(tuple) {
-		return this.inherited(arguments);
+		if (tuple) {
+			if (!this.matchField(tuple.sourceId, this.sourceId) || 
+				!this.matchField(tuple.targetId, this.targetId) ||
+				!this.matchField(tuple.topic, this.topic)) {
+				return false;
+			}
+			return true;
+		} else {
+			return false;
+		}
 	},
 	
 	laterThan: function(tuple) {

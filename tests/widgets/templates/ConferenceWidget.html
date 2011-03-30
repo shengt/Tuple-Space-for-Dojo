@@ -1,0 +1,27 @@
+<div class="${baseClass}">
+	<div>
+		<form onsubmit="return false;">
+			<h2>Conference Details</h2>
+			<div>
+				<label for="${id}_NameInput">Name: </label>
+				<input id="${id}_NameInput" dojoAttachPoint="confNameInput" class="ts_inputBox" style="color:gray" type="text" readonly value="${confName}">
+			</div><br>
+			<div>
+				<label for="${id}_LocationInput">Location: </label>
+				<input id="${id}_LocationInput" dojoAttachPoint="locationInput" class="ts_inputBox" type="text" value="${confLocation}">
+			</div><br>
+			<div>
+				<label for="${id}_DateInput">Date: </label>
+				<input id="${id}_DateInput" dojoAttachPoint="dateInput" class="ts_inputBox" type="text" value='${confDate}'>
+			</div><br>
+			<div>
+				<label for="${id}_WebSiteInput">Payload: </label>
+				<input id="${id}_WebSiteInput" dojoAttachPoint="websiteInput" class="ts_inputBox" type="text" value='${confWebsite}'>
+			</div>
+		</form>
+	</div>
+	<hr>
+	<div>
+		<button dojoAttachEvent="onclick:showDetails" id="${id}_showDetailsBtn">Show Details</button>
+	</div>
+</div>

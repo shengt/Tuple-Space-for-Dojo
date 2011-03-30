@@ -2,7 +2,7 @@
 		"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>Tuple Space Test: Test inter-widget communication</title>
+		<title>Tuple Space Test: Real Scenario Test</title>
 		<style type="text/css">
 			@import "../build/dojo-release-1.5.0-src/dojo/resources/dojo.css";
 			@import "../build/dojo-release-1.5.0-src/dijit/tests/css/dijitTests.css";
@@ -11,7 +11,7 @@
 			@import "../build/dojo-release-1.5.0-src/dojox/layout/resources/DndGridContainer.css";
 		</style>
 		
-		<link rel="stylesheet" href="./widgets/testWidget.css">
+		<link rel="stylesheet" href="./widgets/testWidget.css"></link>
 		
 		<style type="text/css">
 			.tupleSpaceMonitor {
@@ -54,7 +54,8 @@
 			dojo.registerModulePath("nz.ac.auckland", "../../../");
 			dojo.require("nz.ac.auckland.tupleSpace.manager");
 			dojo.require("nz.ac.auckland.tupleSpace.widgets.TupleSpaceWidget");
-			dojo.require("nz.ac.auckland.tests.widgets.TestWidget");
+			dojo.require("nz.ac.auckland.tests.widgets.ConferenceWidget");
+			dojo.require("nz.ac.auckland.tests.widgets.MapWidget");
 			
 		</script>
 		<script type="text/javascript">
@@ -62,20 +63,14 @@
 				var ts = nz.ac.auckland.tupleSpace, 
 					tsm = nz.ac.auckland.tupleSpace.manager;
 				
-				/*
-				var dijit1 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_1"}, dojo.byId("widget1"));
-				var dijit2 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_2"}, dojo.byId("widget2"));
-				var dijit3 = new nz.ac.auckland.tests.widgets.TestWidget({sourceId: "src_3"}, dojo.byId("widget3"));
-				*/
-				
-				doh.register("TupleSpace: Inter-widget Communication", []);
+				doh.register("TupleSpace: Map-widget Communication", []);
 				doh.run();
 			});
 			</script>
 	</head>
 	<body class="tundra">
-		<h1>Real Widget Communication</h1>
-		This page is intended for testing of the functions of inter-widget communication.
+		<h1>Conference Scenario Test</h1>
+		A real scenario to demostrate inter-widget communication
 		
 		<div>
 			<div id="tupleSpace" style="height:100px;overflow-y:auto;padding:10px;">
@@ -83,21 +78,21 @@
 			</div>
 			<div dojoType="dojox.layout.GridContainer" nbZones="2" opacity="0.7"
 				allowAutoScroll="true" hasResizableColumns="false" withHandles="true" acceptTypes="TitlePane" dragRestriction="true">
-				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Widget 1">
+				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Conference Details">
 					<div class="widget" id="widget1">
-						<div dojoType="nz.ac.auckland.tests.widgets.TestWidget" sourceId="src_1" id="testWidget_1"></div>
+						<div dojoType="nz.ac.auckland.tests.widgets.ConferenceWidget" baseClass="testWidget" id="confWidget_1"></div>
 					</div>
 				</div>
 				
-				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Widget 2">
+				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="widget 3">
 					<div class="widget" id="widget2">
-						<div dojoType="nz.ac.auckland.tests.widgets.TestWidget" sourceId="src_2" id="testWidget_2"></div>
+						
 					</div>
 				</div>
 				
-				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Widget 3">
+				<div dojoType="dijit.TitlePane" dndType="TitlePane" title="Map">
 					<div class="widget" id="widget3">
-						<div dojoType="nz.ac.auckland.tests.widgets.TestWidget" sourceId="src_3" id="testWidget_3"></div>
+						<div dojoType="nz.ac.auckland.tests.widgets.MapWidget" baseClass="mapWidget"></div>
 					</div>
 				</div>
 	

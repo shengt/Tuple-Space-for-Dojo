@@ -22,7 +22,7 @@ dojo.require("nz.ac.auckland.tupleSpace.manager");
 			this.inherited(arguments);
 
 			this.connect(tupleSpace, "write", "update");
-			this.connect(tupleSpace, "take", "update");
+			this.connect(tupleSpace, "readAllMatched", "update");
 			this.connect(tupleSpace, "reset", "update");
 		},
 		
